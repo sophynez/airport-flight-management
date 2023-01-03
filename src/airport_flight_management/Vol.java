@@ -1,28 +1,28 @@
 package airport_flight_management;
 
-import java.util.ArrayList;
+import java.util.ArrayList; 
 import java.util.Date;
 
 public class Vol {
 	private Date dateDepart;
 	private Date dateArrive;
 	
-	private String lieuDepart;
-	private String lieuArrive;
+	private Position lieuDepart;
+	private Position lieuArrive;
 	
-	private ArrayList<String> escale;
+	private ArrayList<Station> escale;
 	
 	private String numVol;
 	private String numAvion;
 	
 	private Type type;
 	
-	private float vitesse;
+	private float vitesse; // the flight does not have a speed
 	
 	
 	private Etat etat;
 
-	public Vol(Date dateDepart, Date dateArrive, String lieuDepart, String lieuArrive, ArrayList<String> escale,
+	public Vol(Date dateDepart, Date dateArrive, String lieuDepart, String lieuArrive, ArrayList<Station> escale,
 			String numVol, String numAvion, Type type, float vitesse, Etat etat) {
 		super();
 		this.dateDepart = dateDepart;
@@ -36,6 +36,7 @@ public class Vol {
 		this.vitesse = vitesse;
 		this.etat = etat;
 	}
+	
 
 	public Date getDateDepart() {
 		return dateDepart;

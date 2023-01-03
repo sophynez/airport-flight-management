@@ -1,6 +1,8 @@
 package airport_flight_management;
 
-public class Position {
+import java.io.Serializable;
+
+public class Position implements Serializable {
 	
 	private float x, y, z;
 
