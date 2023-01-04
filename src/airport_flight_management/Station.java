@@ -6,13 +6,14 @@ public class Station {
 	
 	private String name;
 	
-	private float capaciteAcceuil;
+	private int capaciteAcceuil;
 	
 	private float capaciteReservoir;
 	
 	private Position position;
+	
 
-	public Station(String iD, float capaciteAcceuil, float capaciteReservoir, Position position) {
+	public Station(String iD, int capaciteAcceuil, float capaciteReservoir, Position position) {
 		super();
 		ID = iD;
 		this.capaciteAcceuil = capaciteAcceuil;
@@ -28,11 +29,11 @@ public class Station {
 		ID = iD;
 	}
 
-	public float getCapaciteAcceuil() {
+	public int getCapaciteAcceuil() {
 		return capaciteAcceuil;
 	}
 
-	public void setCapaciteAcceuil(float capaciteAcceuil) {
+	public void setCapaciteAcceuil(int capaciteAcceuil) {
 		this.capaciteAcceuil = capaciteAcceuil;
 	}
 

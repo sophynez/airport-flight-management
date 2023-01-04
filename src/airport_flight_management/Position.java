@@ -6,7 +6,17 @@ import java.lang.Math;
 
 public class Position implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7233459839599909384L;
 	private float x, y, z;
+	
+	public Position() {
+		this.x = -1;
+		this.y = -1;
+		this.z = -1;
+	}
 
 	public Position(float x, float y, float z) {
 		super();
@@ -45,6 +55,12 @@ public class Position implements Serializable {
 	public void setZ(float z) {
 		this.z = z;
 	}
+
+	@Override
+	public String toString() {
+		return "Position [x=" + x + ", y=" + y + ", z=" + z + "]";
+	}
+	
 	
 	
 

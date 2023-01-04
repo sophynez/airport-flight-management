@@ -21,8 +21,10 @@ public class Vol {
 	
 	
 	private Etat etat;
-
-	public Vol(Date dateDepart, Date dateArrive, String lieuDepart, String lieuArrive, ArrayList<Station> escale,
+	
+	
+	
+	public Vol(Date dateDepart, Date dateArrive, Position lieuDepart, Position lieuArrive, ArrayList<Station> escale,
 			String numVol, String numAvion, Type type, float vitesse, Etat etat) {
 		super();
 		this.dateDepart = dateDepart;
@@ -53,30 +55,38 @@ public class Vol {
 	public void setDateArrive(Date dateArrive) {
 		this.dateArrive = dateArrive;
 	}
+	
+	
 
-	public String getLieuDepart() {
+	public Position getLieuDepart() {
 		return lieuDepart;
 	}
 
-	public void setLieuDepart(String lieuDepart) {
+
+	public void setLieuDepart(Position lieuDepart) {
 		this.lieuDepart = lieuDepart;
 	}
 
-	public String getLieuArrive() {
+
+	public Position getLieuArrive() {
 		return lieuArrive;
 	}
 
-	public void setLieuArrive(String lieuArrive) {
+
+	public void setLieuArrive(Position lieuArrive) {
 		this.lieuArrive = lieuArrive;
 	}
 
-	public ArrayList<String> getEscale() {
+
+	public ArrayList<Station> getEscale() {
 		return escale;
 	}
 
-	public void setEscale(ArrayList<String> escale) {
+
+	public void setEscale(ArrayList<Station> escale) {
 		this.escale = escale;
 	}
+
 
 	public String getNumVol() {
 		return numVol;
