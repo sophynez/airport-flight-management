@@ -1,5 +1,4 @@
 package airport_flight_management;
-
 /* To change th choose Tools | Templates
  * and open the template in the editor.
  */
@@ -80,7 +79,7 @@ public class radar extends JPanel {
     boolean firstRun = true;
     
     static //---------------------------
-    Position position = new Position();
+    Position positionAvionCourant = new Position();
     
     //---------------------------
     Image Tcontrole;
@@ -94,11 +93,12 @@ public class radar extends JPanel {
     public static void main(String[] args)throws IOException, ClassNotFoundException {
         new radar();
         
-    	final float CAPACITE_CARBURANT_MAX = 10;
 		final float CAPACITE_ACCEUIL_MAX = 10;
+		final float DISTANCE_MIN = 10; 
+		final float SEUIL = 10;
 		
 		ArrayList<Vol> annuaireVols = new ArrayList<Vol>();
-		ArrayList<Avion> annuaireAvion = new ArrayList<Avion>();
+		ArrayList<AvionInfo> annuaireAvion = new ArrayList<AvionInfo>();
 		ArrayList<Station> annuaireStations = new ArrayList<Station>();
 		
 		
@@ -116,14 +116,15 @@ public class radar extends JPanel {
 		
 		System.out.println("Server init");
 		
-		annuaireStations.add(new Station("id1", 4, 0, new Position(1, 1, 0)));
-		annuaireStations.add(new Station("id2", 4, 0, new Position(10, 1, 0)));
-		annuaireStations.add(new Station("id3", 10, 100, new Position(1, 10, 0)));
-		annuaireStations.add(new Station("id4", 4, 100, new Position(25, 30, 0)));
+		//annuaireStations.add(new Station("id1", 4, 0, new Position(1, 1, 0)));
+		//annuaireStations.add(new Station("id2", 4, 0, new Position(10, 1, 0)));
+		//annuaireStations.add(new Station("id3", 10, 1000, new Position(1, 10, 0)));
+		annuaireStations.add(new Station("id4", 4, 100, new Position(-80, -20, 0)));
+		annuaireAvion.add(new AvionInfo("ki7854"));
+		annuaireAvion.add(new AvionInfo(new Position(5.0f, 5.0f,0.0f), "dummy"));
 		
-		//annuaireVols.add(new )
+		//annuaireVols.add(new)
 		
-		// creation socket + assicoation port
 		 		
 		// mise en ecoute + acceptation requete
     	ServerSocket ss = new ServerSocket(5555); 
@@ -133,73 +134,150 @@ public class radar extends JPanel {
 		
 		
         while(true) {
+        	
+        	// reception du numero de reference
+        	System.out.println("Getting avion ref");
+        	String numRef = "";
+        	numRef = (String) ois.readObject();
 
+        	
 	        //réception de la position de l'avion connecté
         	System.out.println("Getting avion pos");
-	        
-	        position = (Position) ois.readObject();
-			System.out.println(position);
-			//  reception de l'atat du reservoir 
-	        System.out.println("Getting avion etat");
-			Etat etat;
-			etat = (Etat) ois.readObject();
+	        positionAvionCourant = (Position) ois.readObject();
+			System.out.println(positionAvionCourant);
 			
-			// reception du numero de reference
-			System.out.println("Getting avion ref");
-			String numRef = "";
-			numRef = (String) ois.readObject();
-			//numRef =(String) dis.readUTF(); // intercepter l'etat du reservoir envoyé par l'avion
-			//System.out.println(numRef);
+			for (int i = 0 ; i<annuaireAvion.size() ; i++) {
+				AvionInfo avionInfo = annuaireAvion.get(i);
+				if (avionInfo.getNumRef().equals(numRef)) {
+					annuaireAvion.get(i).setPosition(positionAvionCourant);
+					break;
+				}
+			}
+			
+			
+			
+			System.out.println("Getting avion carburant");
+			float reservoir;
+			reservoir = (float) ois.readObject();
+			
+			Etat etat;
+			// on suppose que l'avion a assez de carburant et n'est pas en risque de collision
+			etat = Etat.NORMAL;
+			
+			
+			//Detection Collision
+			for (int i = 0; i<=annuaireAvion.size(); i++) {
+				Position positionOtherAvions = annuaireAvion.get(i).getPosition();
+				String NumRefOtherAvion = annuaireAvion.get(i).getNumRef();
+				// on ne cherche les collision que  pour les avions qui sont a la même altitude
+				if (positionOtherAvions.getZ() == positionAvionCourant.getZ()){
+					float dis = positionAvionCourant.calculerDistance(positionOtherAvions.getX(), positionOtherAvions.getY());
+					if (dis <= DISTANCE_MIN) {
+						positionAvionCourant.setZ((positionAvionCourant.getZ() % 5) +1);
+						break;
+					}
+				}
+			}
+			
+			//renvoie de l'altitude vers l'avion pour la mise ajours et evitement de la collision
+			System.out.println("Sending Z to Avion");
+			oos.writeObject(positionAvionCourant.getZ());
+			
+			if (reservoir < SEUIL) {
+				/*
+				 * si la quantité de carburant est inférieur à un seuil, 
+				 * on considère qu'il lui manque du carburant 
+				 */
+				etat = Etat.MANQUE_CARBURANT;
+			}
 			
 			for (int i = 0; i < annuaireVols.size(); i++) {
 				if(annuaireVols.get(i).getNumAvion().equals(numRef)) {
+					// On met a jours l'etat du vol dansl'annuaire
 					annuaireVols.get(i).setEtat(etat);
 				}
 			}
+			
+			//send etat to avion
+			System.out.println("sending new etat to avion");
+			oos.writeObject(etat);
+			
 			System.out.println(annuaireVols.get(0).getEtat());
-			//Cas ou carburant insufisant ---> routage
-			if(Etat.MANQUE_CARBURANT ==  etat) 
-			{
+			//Cas ou carburant insuffisant ---> routage
+			if(Etat.MANQUE_CARBURANT ==  etat) {
 				float min = 10000000;
 				int statIndex = -1;
 				System.out.println("deteminer station");
-				for (int i = 0; i <annuaireStations.size(); i++) 
-				{
+				
+				//Mettre toutes les station dans la PQ				
+				for (int i = 0; i <annuaireStations.size(); i++) {
 					//on prend la position de la station i
 					Position stats = annuaireStations.get(i).getPosition();
-					//on calcule la distence
-					float dis = position.calculerDistance(stats.getX(), stats.getY());
+					//on calcule la distence entre l'avion et la station
+					float dis = positionAvionCourant.calculerDistanceManhattan(stats.getX(), stats.getY());
 					//on sauvegarde ça dans une pile a priorité en fonction de la distence
 					pq.add(new Routing(annuaireStations.get(i), dis));
 				}
-				boolean cantRefill = false;
+				//Used to keep position of the closest station with empty space regardless of fioul
+				boolean  closestFreeStation  = false;
+				//if true alors l'avion va crash anyways
+				boolean crash = false;
+				//used to tell that we found a good station
+				boolean reFiouled = false;
 				Position positionUrgence = new Position();
 				Position positionRoutage = new Position();
 				
-				while(!pq.isEmpty())
-				{
-					Station stat = pq.poll().getStation();
-					System.out.println(stat.getCapaciteAcceuil());
-					if (stat.getCapaciteAcceuil() < CAPACITE_ACCEUIL_MAX && !cantRefill){
-						positionUrgence = stat.getPosition();
-						cantRefill = true;
+				while(!pq.isEmpty()){
+					Routing routage = pq.poll();
+					Station stationRoutage = routage.getStation();
+					float distanceRoutage = routage.getDistence();
+					
+					if (reservoir < distanceRoutage) {
+						crash = true;
+						break;
 					}
-					if (stat.getCapaciteReservoir() >= CAPACITE_CARBURANT_MAX 
-							&& stat.getCapaciteAcceuil() < CAPACITE_ACCEUIL_MAX) {
-						
-						positionRoutage = stat.getPosition();
+					
+					System.out.println(stationRoutage.getAvailableSlots());
+					
+					if (stationRoutage.getAvailableSlots() < CAPACITE_ACCEUIL_MAX && !closestFreeStation ){
+						/*
+						 * on save la position de la station la plus proche 
+						 * ou l'avion peut atterrir
+						 */
+						positionUrgence = stationRoutage.getPosition();
+						closestFreeStation = true;
+					}
+					if (stationRoutage.getQuantiteCarburant() > (300 - reservoir) 
+							&& stationRoutage.getAvailableSlots() < CAPACITE_ACCEUIL_MAX) {
+						/*
+						 * on récupère la position de la statio la plus proche avec assez de place 
+						 * ET de carburant
+						 */
+						System.out.println("sending new etat to avion");
+						etat = Etat.MANQUE_CARBURANT;
+						oos.writeObject(etat);
+						positionRoutage = stationRoutage.getPosition();
 						oos.writeObject(positionRoutage);
+						reFiouled = true;
 						break;
 					}	
 				}
-				System.out.println("sending routage");
-				if (pq.isEmpty() && cantRefill) {
+				
+				
+				
+
+				if (!reFiouled && closestFreeStation) {
 					System.out.println("sending routage no fioul");
+					System.out.println("sending new etat to avion");
+					etat = Etat.MANQUE_CARBURANT;
+					oos.writeObject(etat);
 					oos.writeObject(positionUrgence);
 				}else {
 					System.out.println("u ded no station to save u");
-					Position positionDead = new Position(-1, -1, -1);
-					oos.writeObject(positionDead);
+					System.out.println("sending new etat to avion");
+					etat = Etat.FIN_CARBURANT;
+					oos.writeObject(etat);
+
 					//envoie
 				}
 				
@@ -261,9 +339,9 @@ public class radar extends JPanel {
     
     private void initImages() {
 		// TODO Auto-generated method stub
-    	Tcontrole = new ImageIcon(radar.class.getResource("/images/satellite-dish (1).png")).getImage(); 
-    	Airport = new ImageIcon(radar.class.getResource("/images/hangar.png")).getImage(); 
-    	Background = new ImageIcon(radar.class.getResource("/images/radar-background.jpg")).getImage(); 
+    	//Tcontrole = new ImageIcon(radar.class.getResource("/images/satellite-dish (1).png")).getImage(); 
+    	//Airport = new ImageIcon(radar.class.getResource("/images/hangar.png")).getImage(); 
+    	//Background = new ImageIcon(radar.class.getResource("/images/radar-background.jpg")).getImage(); 
 
     }
     
@@ -326,7 +404,7 @@ public class radar extends JPanel {
     	g2.setColor(Color.red);
     	
     	
-     g2.fill(new Ellipse2D.Double(position.getX(), position.getY(), 10, 10));
+     g2.fill(new Ellipse2D.Double(positionAvionCourant.getX(), positionAvionCourant.getY(), 10, 10));
 
 
     }
@@ -351,6 +429,7 @@ public class radar extends JPanel {
     private void drawImages() {
    	 g2.drawImage(Tcontrole, -16, -16, this);
    	 g2.drawImage(Airport, -200, -50, this);
+   	 g2.drawImage(Airport, -96, -36, this);
      g2.setTransform(defaultTransform);
    }
    

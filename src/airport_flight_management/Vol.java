@@ -1,9 +1,11 @@
 package airport_flight_management;
 
+import java.io.Serializable;
 import java.util.ArrayList; 
 import java.util.Date;
 
-public class Vol {
+public class Vol implements Serializable{
+	private static final long serialVersionUID = -8175418680875955838L;
 	private Date dateDepart;
 	private Date dateArrive;
 	
@@ -17,15 +19,18 @@ public class Vol {
 	
 	private Type type;
 	
-	private float vitesse; // the flight does not have a speed
+	private float vitesse; 
 	
 	
-	private Etat etat;
+	private Etat etatCarburant;
+	private Etat etatCollision;
 	
-	
+	public Vol() {
+		super();
+	}
 	
 	public Vol(Date dateDepart, Date dateArrive, Position lieuDepart, Position lieuArrive, ArrayList<Station> escale,
-			String numVol, String numAvion, Type type, float vitesse, Etat etat) {
+			String numVol, String numAvion, Type type, float vitesse, Etat etatCarburant) {
 		super();
 		this.dateDepart = dateDepart;
 		this.dateArrive = dateArrive;
@@ -36,9 +41,24 @@ public class Vol {
 		this.numAvion = numAvion;
 		this.type = type;
 		this.vitesse = vitesse;
-		this.etat = etat;
+		this.etatCarburant = etatCarburant;
 	}
 	
+	public Vol(Date dateDepart, Date dateArrive, Position lieuDepart, Position lieuArrive, ArrayList<Station> escale,
+			String numVol, String numAvion, Type type, float vitesse, Etat etatCarburant, Etat etatCollision) {
+		super();
+		this.dateDepart = dateDepart;
+		this.dateArrive = dateArrive;
+		this.lieuDepart = lieuDepart;
+		this.lieuArrive = lieuArrive;
+		this.escale = escale;
+		this.numVol = numVol;
+		this.numAvion = numAvion;
+		this.type = type;
+		this.vitesse = vitesse;
+		this.etatCarburant = etatCarburant;
+		this.etatCollision = etatCollision;
+	}
 
 	public Date getDateDepart() {
 		return dateDepart;
@@ -122,14 +142,37 @@ public class Vol {
 	}
 
 	public Etat getEtat() {
-		return etat;
+		return etatCarburant;
 	}
 
 	public void setEtat(Etat etat) {
-		this.etat = etat;
+		this.etatCarburant = etat;
 	}
 	
+	public void addRoutage(Station station) {
+		escale.add(0, station);
+	}
 	
+	public Position getNextEscalePosition() {
+		Position nextStation = escale.get(0).getPosition();
+		return nextStation;
+	}
+	
+	public void setNextEscale() {
+			escale.remove(0);
+	}
+	
+	public void addRoutage(Position position) {
+		escale.add(0, new Station(position));
+	}
+
+	@Override
+	public String toString() {
+		return "Vol [dateDepart=" + dateDepart + ", dateArrive=" + dateArrive + ", lieuDepart=" + lieuDepart
+				+ ", lieuArrive=" + lieuArrive + ", escale=" + escale + ", numVol=" + numVol + ", numAvion=" + numAvion
+				+ ", type=" + type + ", vitesse=" + vitesse + ", etatCarburant=" + etatCarburant + ", etatCollision="
+				+ etatCollision + "]";
+	}
 	
 	
 	

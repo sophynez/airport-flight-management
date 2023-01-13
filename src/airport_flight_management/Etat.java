@@ -1,6 +1,8 @@
 package airport_flight_management;
 
-public enum Etat {
+import java.io.Serializable;
+
+public enum Etat implements Serializable{
 	
 	NORMAL,
 	MANQUE_CARBURANT,

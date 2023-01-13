@@ -1,5 +1,4 @@
 package airport_flight_management;
-
 import java.io.Serializable;
 import java.lang.Math;
 
@@ -30,6 +29,10 @@ public class Position implements Serializable {
 		
 		return (float) Math.sqrt(Math.pow((x-this.x), 2) + Math.pow((y-this.y), 2) );
 	
+	}
+	
+	public float calculerDistanceManhattan(float x, float y) {
+		return Math.abs(x-this.x) + Math.abs(y-this.y);
 	}
 	
 	public float getX() {

@@ -16,15 +16,25 @@ public class Avion {
 	
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
 		try {
+			// Quantité  de carburant de l'avion
+			float reservoir = 300;
+			// seuil au dessous du quel on considère qu'un avons pas assez de carburant
+			float seuil = 20;
 			
-			float reservoir = 100;
-			float seuil = 10; // en assumant que le reservoir == 10, valeur arbitraire pour l'instant
 			Etat etat;
-			final float consommation = 1; // consommation carburant par 10km
+			//Consommation de carburant par unité de distance 
+			final float consommationParUniteDistance = 1; 
 			State state;
+			//Numéro de référence de l'avion
 			String numReference;
+			// variable qui permet de déterminé si l'avion est arrivé à destination
 			Boolean arrived=false;
+			// Position Actuelle de l'avion
 			Position position= new Position((float)0, (float)0,(float)0);
+			//variable utilisé pour savoir si l'avion à recu les informations relatif au vol
+			boolean received = false;
+			
+			
 			int i = -1;
 	    	float j= (float) -1;
 	    	
@@ -33,103 +43,121 @@ public class Avion {
 			Position lieuDepart = new Position(0,0,0);
 			Position lieuArrive = new Position(-184, -34,0);
 			ArrayList<Station> escale = new ArrayList<Station>();
+			escale.add(new Station("1", 100, 5000, lieuArrive));
 			
 			Vol V = new Vol(dateDepart,dateArrive,lieuDepart,lieuArrive,escale,"CA45", "ki7854",Type.DIRECT, (float) 1, Etat.NORMAL);
-			
+			//Vol V = new Vol();
 	    	
 
-	        /*// envoi du numero de reference 
-	        numReference = "ki7854";
-	     	objectOutputStream.writeObject(numReference);*/
 	        Socket socket=new Socket("localhost", 5555);
 	        ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
 	        ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 			
 	        while(true) {
-
-			reservoir = reservoir - consommation;
+	        	
+	        // envoi du numero de reference 
+			numReference = "ki7854";
+			System.out.println("Sending numReference to server ");
+			objectOutputStream.writeObject(numReference);
+			//dout.writeUTF(numReference);
+				
+	        
+			reservoir = reservoir - consommationParUniteDistance;
 			
 			// comparer avec les seuils
 			if(reservoir <= seuil && !arrived ) {
 				etat= Etat.MANQUE_CARBURANT;
-				//etat = "etat reservoir critique";
 			}
 			else { 
 				etat= Etat.NORMAL;
-				//etat =  "etat reservoir normal"; }
 			}
-			
-			if(V.getLieuArrive().getX() == position.getX()) {
+			System.out.println("my position is ");
+			System.out.println(position);
+			System.out.println("Next escale is");
+			//System.out.println(V.getNextEscalePosition());
+			if(V.getNextEscalePosition().getX() == position.getX()) {
 	    		i=0;
 	    	}
-	    	if(V.getLieuArrive().getY() == position.getY()) {
+			if(V.getNextEscalePosition().getX() > position.getX()) {
+	    		i=1;
+	    	}
+
+	    	if(V.getNextEscalePosition().getY() == position.getY()) {
 	    		j=0;
+	    	}
+	    	if(V.getNextEscalePosition().getY() > position.getY()) {
+	    		j=1;
 	    	}
 	    	if (i !=0 || j!=0) {
 	    		position.setX(position.getX()+i);
 	    		position.setY(position.getY()+j);
 	    	}
-	    	else {//avion arriv�
+	    	else {
+	    		//avion arrive
+	    		System.out.println("ARRIVE HERE");
 	    		arrived = true;
 	    	}
 			
 			
-			// creation socket + connexion port
-  
-			
-			//DataInputStream dis=new DataInputStream(socket.getInputStream());  
-			//DataOutputStream dout=new DataOutputStream(socket.getOutputStream());
-			
-	
-			// for sending objects
-			// get the output stream from the socket.
-	       // OutputStream outputStream = socket.getOutputStream();
-	        // create an object output stream from the output stream so we can send an object through it
 	    	if (!arrived) {
+	    		
 	    		// envoi de la position
-		    	
 				System.out.println("Sending position to server ");
 		        objectOutputStream.writeObject(new Position((float)position.getX(), (float)position.getY(),(float)0));
 		        
-		        //Envoi de l'Ã©tat
-		        
-		        System.out.println("Sending etat to server ");
-		        objectOutputStream.writeObject(etat);
-				
-				//dout.writeUTF(etat);
-				
-				// envoi du numero de reference 
-				numReference = "ki7854";
-				System.out.println("Sending numReference to server ");
-				objectOutputStream.writeObject(numReference);
-				//dout.writeUTF(numReference);
+		        /*
+		         *Envoi de l'etat
+		         *System.out.println("Sending etat to server ");
+		         *objectOutputStream.writeObject(etat);
+				*/
 				
 				
-				if (etat == Etat.MANQUE_CARBURANT) {
-					System.out.println("Reception numReference to server ");
+				
+				//Envoie de la quantité de carburant
+				System.out.println("Sending carburant to server");
+				objectOutputStream.writeObject(reservoir);
+				
+				
+				//reception de la coordonné z pour eviter collision
+				position.setZ((float) ois.readObject());
+				
+				//recive etat par avion
+				etat = (Etat) ois.readObject();
+				
+				boolean  crash = false;
+				
+				switch (etat) {
+				case MANQUE_CARBURANT:
+					System.out.println("Reception station Routage to server ");
 					Position positionRoutage = (Position) ois.readObject();
-					
-					if (positionRoutage.getX() == -1 && positionRoutage.getY() == -1 && positionRoutage.getZ() == -1) {
-						System.out.println("me ded");
-						ois.close();
-						objectOutputStream.close();
-						socket.close();
-						break;
-					}
-					
+					System.out.println("REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE "+positionRoutage);
+					V.setLieuArrive(positionRoutage);					
 					System.out.println(positionRoutage.toString());
+					break;
+				case FIN_CARBURANT:
+					crash = true;
+					position.setZ(-1.0f);
+					break;
 				}
-				
+				if (crash) {
+					System.out.println("Me ded");
+					break;
+				}
 			}
 	    	else {
-	    		System.out.println("AVION ARRIVE A destination");
-	    		break;
+	    		V.setNextEscale();
+	    		if(V.getEscale().isEmpty()) {
+	    			System.out.println("AVION ARRIVE A destination");
+	    			break;
+	    		}else {
+	    			arrived = false;
+	    		}
 	    	}
 			
 			Thread.sleep(100);
 			
 	        }
-			// ecrire message depuis console et l'envoyer au serveur
+
 	        objectOutputStream.close();
 			ois.close();
 			ois.close();

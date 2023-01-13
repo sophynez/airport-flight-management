@@ -1,12 +1,7 @@
 package airport_flight_management;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -43,7 +38,7 @@ public class TourDeControl {
 		final float CAPACITE_CARBURANT_MAX = 10;
 		final float CAPACITE_ACCEUIL_MAX = 10;
 		
-		ArrayList<Vol> annuaireVols = new ArrayList<Vol>();;
+		ArrayList<Vol> annuaireVols = new ArrayList<Vol>();
 		ArrayList<Avion> annuaireAvion = new ArrayList<Avion>();
 		ArrayList<Station> annuaireStations = new ArrayList<Station>();
 		
@@ -58,9 +53,6 @@ public class TourDeControl {
 		annuaireStations.add(new Station("id4", 4, 100, new Position(25, 30, 0)));
 		
 		//annuaireVols.add(new )
-
-		
-		
 		// creation socket + assicoation port
 		 
 					
@@ -103,7 +95,6 @@ public class TourDeControl {
 				//on sauvegarde ça dans une pile a priorité en fonction de la distence
 				pq.add(new Routing(annuaireStations.get(i), dis));
 			}
-			
 			boolean cantRefill = false;
 			Position positionUrgence = new Position();
 			Position positionRoutage = new Position();
@@ -111,13 +102,13 @@ public class TourDeControl {
 			
 			while(!pq.isEmpty()){
 				Station stat = pq.poll().getStation();
-				System.out.println(stat.getCapaciteAcceuil());
-				if (stat.getCapaciteAcceuil() < CAPACITE_ACCEUIL_MAX && !cantRefill){
+				System.out.println(stat.getAvailableSlots());
+				if (stat.getAvailableSlots() < CAPACITE_ACCEUIL_MAX && !cantRefill){
 					positionUrgence = stat.getPosition();
 					cantRefill = true;
 				}
-				if (stat.getCapaciteReservoir() >= CAPACITE_CARBURANT_MAX 
-						&& stat.getCapaciteAcceuil() < CAPACITE_ACCEUIL_MAX) {
+				if (stat.getQuantiteCarburant() >= CAPACITE_CARBURANT_MAX 
+						&& stat.getAvailableSlots() < CAPACITE_ACCEUIL_MAX) {
 					
 					positionRoutage = stat.getPosition();
 					oos.writeObject(positionRoutage);
