@@ -46,35 +46,22 @@ public class Avion {
 			else { etat =  "etat reservoir normal"; }
 			
 			
-			// creation socket + connexion port
-  
-			
-			//DataInputStream dis=new DataInputStream(socket.getInputStream());  
-			//DataOutputStream dout=new DataOutputStream(socket.getOutputStream());
-			
-	
-			// for sending objects
-			// get the output stream from the socket.
-	       // OutputStream outputStream = socket.getOutputStream();
-	        // create an object output stream from the output stream so we can send an object through it
-
 	        
 			// envoi de la position
 			System.out.println("Sending position to server ");
 	        objectOutputStream.writeObject(position);
 	        
-	        //Envoi de l'Ã©tat
+	        //Envoi de l'etat
 	        
 	        System.out.println("Sending etat to server ");
 	        objectOutputStream.writeObject(etat);;
 			
-			//dout.writeUTF(etat);
 			
 			// envoi du numero de reference 
 			numReference = "ki7854";
 			System.out.println("Sending numReference to server ");
 			objectOutputStream.writeObject(numReference);
-			//dout.writeUTF(numReference);
+		
 			
 			System.out.println("Reception numReference to server ");
 			Position positionRoutage = (Position) ois.readObject();

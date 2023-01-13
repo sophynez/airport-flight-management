@@ -142,12 +142,6 @@ public class TourDeControl {
 		    s.close();*/
         }
 		
-		
-		
-		
-		
-		// fermer les point d'entrée
-		
 
 	}
 
