@@ -8,8 +8,9 @@ public class Station implements Serializable{
 
 	private String ID;
 	
+	//nombre d'avion déjà sur place
 	private int capaciteAcceuil;
-	
+	//nombre d'avion déjà sur place
 	private float capaciteReservoir;
 	
 	private Position position;

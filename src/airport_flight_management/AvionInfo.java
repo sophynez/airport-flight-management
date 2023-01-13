@@ -2,7 +2,7 @@ package airport_flight_management;
 
 public class AvionInfo {
 
-	
+	//position de l'avion
 	private Position position;
 	
 	private String numRef;

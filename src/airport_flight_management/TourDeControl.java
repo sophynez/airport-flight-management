@@ -39,7 +39,7 @@ public class TourDeControl {
 		final float CAPACITE_ACCEUIL_MAX = 10;
 		
 		ArrayList<Vol> annuaireVols = new ArrayList<Vol>();
-		ArrayList<Avion> annuaireAvion = new ArrayList<Avion>();
+		ArrayList<ExAvion> annuaireAvion = new ArrayList<ExAvion>();
 		ArrayList<Station> annuaireStations = new ArrayList<Station>();
 		
 		PriorityQueue<Routing> pq = new PriorityQueue<Routing>(5, new RoutageComparator());

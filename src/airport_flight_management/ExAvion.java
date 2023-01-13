@@ -11,7 +11,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Avion {
+public class ExAvion {
 	
 	
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {

@@ -33,12 +33,13 @@ class ClientHandler implements Runnable {
 		etat = Etat.NORMAL;
 		
     	try {
-    		System.out.println("Getting avion ref");
+    		//System.out.println("Getting avion ref");
+    		//Get numRef de l'avion
         	String numRef = "";
 			numRef = (String) ois.readObject();
 			System.out.println(numRef);
 			
-			
+			// on cherche le vol associe a l'avion
 			Vol vol = new Vol();
 			for (int i = 0; i<Server.annuaireVols.size(); i++) {
 				if (Server.annuaireVols.get(i).getNumAvion().equals(numRef)) {
@@ -80,6 +81,7 @@ class ClientHandler implements Runnable {
 		        Position positionAvionCourant = (Position) ois.readObject();
 				System.out.println(positionAvionCourant);
 				
+				//mise a jours de la position dans l'annuaireAvion
 				for (int i = 0 ; i<Server.annuaireAvion.size() ; i++) {
 					AvionInfo avionInfo = Server.annuaireAvion.get(i);
 					if (avionInfo.getNumRef().equals(numRef)) {
@@ -94,7 +96,7 @@ class ClientHandler implements Runnable {
 				float reservoir;
 				reservoir = (float) ois.readObject();
 				
-				//Detection Collision
+				//Detection de Collision
 				for (int i = 0; i< Server.annuaireAvion.size(); i++) {
 					Position positionOtherAvions = Server.annuaireAvion.get(i).getPosition();
 					String NumRefOtherAvion = Server.annuaireAvion.get(i).getNumRef();
@@ -122,7 +124,7 @@ class ClientHandler implements Runnable {
 				
 				for (int i = 0; i < Server.annuaireVols.size(); i++) {
 					if(Server.annuaireVols.get(i).getNumAvion().equals(numRef)) {
-						// On met a jours l'etat du vol dansl'annuaire
+						// On met a jours l'etat du vol dansl'annuaire vols
 						Server.annuaireVols.get(i).setEtat(etat);
 					}
 				}
@@ -137,7 +139,7 @@ class ClientHandler implements Runnable {
 					int statIndex = -1;
 					System.out.println("deteminer station");
 					
-					//Mettre toutes les station dans la PQ				
+					//Mettre toutes les station dans la Pille de priorite				
 					for (int i = 0; i <Server.annuaireStations.size(); i++) {
 						//on prend la position de la station i
 						Position stats = Server.annuaireStations.get(i).getPosition();
@@ -156,11 +158,17 @@ class ClientHandler implements Runnable {
 					Position positionRoutage = new Position();
 					
 					while(!Server.pq.isEmpty()){
+						//on prendla tete de pile
 						Routing routage = Server.pq.poll();
 						Station stationRoutage = routage.getStation();
 						float distanceRoutage = routage.getDistence();
 						
 						if (reservoir < distanceRoutage) {
+							/*
+							 * si le reservoir suffit pas a faire 
+							 * le trajet alors we give up car le reste des distances est de toute façon plus grand
+							 */
+							
 							crash = true;
 							break;
 						}
@@ -179,7 +187,7 @@ class ClientHandler implements Runnable {
 								&& stationRoutage.getAvailableSlots() < Server.CAPACITE_ACCEUIL_MAX - 1) {
 							/*
 							 * on récupère la position de la statio la plus proche avec assez de place 
-							 * ET de carburant
+							 * **ET** de carburant
 							 */
 							System.out.println("sending new etat to avion");
 							stationRoutage.setCapaciteAcceuil(stationRoutage.getAvailableSlots()+1);
@@ -195,6 +203,10 @@ class ClientHandler implements Runnable {
 					
 					
 					if (!reFiouled && closestFreeStation) {
+						/*
+						 * on a pas trouve de station avec assez de carburant
+						 * mais il existe une station avec assez de place pour ne pas crash
+						 */
 						System.out.println("sending routage no fioul");
 						System.out.println("sending new etat to avion");
 						etat = Etat.MANQUE_CARBURANT;
@@ -212,8 +224,6 @@ class ClientHandler implements Runnable {
 						}
 						oos.writeObject(etat);
 						break;
-
-						//envoie
 					}
 					
 		
@@ -221,7 +231,7 @@ class ClientHandler implements Runnable {
 				
 				System.out.println("Reception state ");
 				int stateAvion = (int) ois.readObject();
-				
+				//mise a jours de state de l'avion
 				for (int i = 0; i<Server.annuaireAvion.size(); i++) {
 					String NumRefOtherAvion = Server.annuaireAvion.get(i).getNumRef();
 					if (NumRefOtherAvion.equals(numRef)) {

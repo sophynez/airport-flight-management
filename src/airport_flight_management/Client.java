@@ -61,7 +61,7 @@ public class Client
 			objectOutputStream.writeObject(numReference);
 			
 				
-	        
+	        // MAJ de la quantite de carburant reservoir
 			reservoir = reservoir - consommationParUniteDistance;
 
 			System.out.println("my position is ");
@@ -110,10 +110,12 @@ public class Client
 				//recive etatCarburant par avion
 				etatCarburant = (Etat) ois.readObject();
 				
+				//crash means l'avion ne peut pas etre routé
 				boolean  crash = false;
 				
 				switch (etatCarburant) {
 				case MANQUE_CARBURANT:
+					//si etat est manque de carburant alors on cherche a avoir la position de routage
 					System.out.println("Reception station Routage to server ");
 					Position positionRoutage = (Position) ois.readObject();
 					System.out.println("REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE "+positionRoutage);
@@ -122,8 +124,9 @@ public class Client
 					System.out.println(positionRoutage.toString());
 					break;
 				case FIN_CARBURANT:
+					// si fin carburan alors on considère que l'avion est crash 
 					crash = true;
-					position.setZ(-1.0f);
+					position.setZ(-10.0f);
 					break;
 				}
 				if (crash) {

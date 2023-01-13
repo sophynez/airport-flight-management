@@ -7,6 +7,8 @@ public class GlobalClient {
 
 	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException, InterruptedException {
 		// TODO Auto-generated method stub
+		
+		//pour pouvoir lancer plusieurs avions defini par leur numRef
 			String[] arguments = new String[] {"Avion 1"};
 			Client.main(arguments);
 	}
