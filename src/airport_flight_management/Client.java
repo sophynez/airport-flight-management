@@ -97,7 +97,7 @@ public class Client
 	    		
 	    		// envoi de la position
 				System.out.println("Sending position to server ");
-		        objectOutputStream.writeObject(position);	
+		        objectOutputStream.writeObject(new Position((float)position.getX(), (float)position.getY(), (float)position.getZ()));	
 				
 				//Envoie de la quantité de carburant
 				System.out.println("Sending carburant to server");

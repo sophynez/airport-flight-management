@@ -9,7 +9,7 @@ public class GlobalClient {
 		// TODO Auto-generated method stub
 		
 		//pour pouvoir lancer plusieurs avions defini par leur numRef
-			String[] arguments = new String[] {"Avion 1"};
+			String[] arguments = new String[] {"Avion 2"};
 			Client.main(arguments);
 	}
 
