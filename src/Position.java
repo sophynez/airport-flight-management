@@ -1,4 +1,3 @@
-package airport_flight_management;
 import java.io.Serializable;
 import java.lang.Math;
 

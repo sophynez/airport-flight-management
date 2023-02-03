@@ -1,5 +1,3 @@
-package airport_flight_management;
-
 import java.io.Serializable;
 
 public class Station implements Serializable{

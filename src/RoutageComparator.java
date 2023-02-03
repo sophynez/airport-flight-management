@@ -1,4 +1,3 @@
-package airport_flight_management;
 import java.util.Comparator;
 
 public class RoutageComparator implements Comparator<Routing> {

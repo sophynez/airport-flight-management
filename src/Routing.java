@@ -1,4 +1,3 @@
-package airport_flight_management;
 public class Routing {
 	
 	private Station station;
