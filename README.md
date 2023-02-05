@@ -1,36 +1,44 @@
-# airport-flight-management
+ ### Flights management in an airport using one server and multiple clients architecture using sockets in Java.
+ <br>
 
-## Projet Reseau
-Gestion des avions dans un aéroport,
+- Server : control tower
+- clients : Airplanes
 
-Tour de control : serveur
-Avions : client
+* An airplane is assigned to a flight
+* The server handles and treats the requests from multiple clients
 
-### Tours de control :
-- Enregistrement des avions dans un annuaire
-    - Annuaire contient l'etat des avions :
-        1. active
-        2. standby
-        3. idel
-        4. broken
-- Programmation des vols
-- Acheminement des avions
-    - etat et posiiton de l'avions en temps réel
-    - visualisation radar
-    - utilisation algorithme plus court chemin pour rajectoire des avions
+### Control tower:
+- Registration flights
+- Treats sates of airplane : 
+    - actif
+    - standby
+    - idle
+    - broken 
+- Airplane routing
+    - status and posiiton of the planes in real time
+    - radar display
+    - use shortest path algorithm for planes rajectory
+    
+
+    
+    ![2](https://user-images.githubusercontent.com/61004176/216826297-b71b0169-f30f-41d0-806b-88706d9db22f.png)
+
+## Radar display of flights 
+States of an airplane :
+- Red : broken (crash)
+- Yellow : in danger either because of lack of fuel or potential collision with other plane
+- Green : actif and safe
+
+<div align="center">
+    <img src="https://user-images.githubusercontent.com/61004176/216826448-812244ac-c5e4-4410-ac65-97dc0c994836.png">
+</div>
+
+## Monitoring dashboard of flights, aiplanes and their states IRT
+<div align="center">
+    <img src="https://user-images.githubusercontent.com/61004176/216826706-decebce0-b591-46dd-84c1-81cd466efd63.png">
+</div>
 
 
-### classes initiales :
-1. Avion : ref, reservoir, etat
-2. tour de control : annuaire_avions, annuaire_station
-3. station : id, nom
-4. annuaire
 
-#### nb :
-- planning des vols définis au préalable ? ajouter objet schedule def par admin (tour de ctrl)
-- créer une fonction tqdm pour le suivi automatique de la consomation du reservoir de l'avion selon la distance parcouru
 
-#### a faire :
-- diagramme de classe + diagramme d'activité
-- répartition des classe et code
 
